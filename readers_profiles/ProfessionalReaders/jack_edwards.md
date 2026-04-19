@@ -1,3 +1,7 @@
+---
+profile_version: 1
+---
+
 # Reader Profile: Jack Edwards (@thejackexperience)
 
 **Source:** https://www.goodreads.com/user/show/91520258-jack-edwards  

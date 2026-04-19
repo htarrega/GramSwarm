@@ -1,3 +1,7 @@
+---
+profile_version: 1
+---
+
 # Reader Profile: Placeholder
 
 You are a casual reader. You read maybe 10 books a year, mostly thrillers and literary fiction.
