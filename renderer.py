@@ -20,6 +20,8 @@ def render_reader_markdown(
         f"",
         f"**Run:** {meta['timestamp']}  ",
         f"**Model:** {meta['model']}  ",
+        f"**Profile v:** {meta.get('profile_version', '?')}  |  "
+        f"**Chapter:** `{meta.get('chapter_hash', '')}`  ",
         f"**Chunks:** {meta['num_chunks']} × ~{meta['chunk_words']} words  ",
         f"**Tokens:** {meta['total_tokens']} (in: {meta['input_tokens']}, out: {meta['output_tokens']})",
         f"",
@@ -113,6 +115,7 @@ def save_reader_run(
         **base_meta,
         "profile": str(profile.path),
         "cluster": profile.cluster,
+        "profile_version": profile.profile_version,
         "num_chunks": len(chunks_data),
         "input_tokens": usage["input_tokens"],
         "output_tokens": usage["output_tokens"],

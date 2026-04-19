@@ -2,6 +2,7 @@
 """GramSwarm — run all reader profiles on a chapter."""
 
 import argparse
+import hashlib
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -36,6 +37,7 @@ def main() -> None:
 
     profiles = load_all_profiles()
     chapter_text = chapter_path.read_text()
+    chapter_hash = hashlib.sha256(chapter_text.encode()).hexdigest()[:12]
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_dir = Path("runs") / f"{timestamp}_{chapter_path.stem}"
@@ -43,15 +45,16 @@ def main() -> None:
 
     print(f"Chapter  : {chapter_path.name}")
     print(f"Readers  : {len(profiles)} — {', '.join(p.name for p in profiles)}")
-    print(f"Chunks   : ~{args.chunk_words} words  |  Model: {DEFAULT_MODEL}")
+    print(f"Chunks   : ~{args.chunk_words} words  |  Model: {DEFAULT_MODEL} ")
     print(f"Run dir  : {run_dir}")
 
-    results = run_readers(profiles, chapter_text, chunk_words=args.chunk_words)
+    results = run_readers(profiles, chapter_text, chunk_words=args.chunk_words, run_dir=run_dir)
 
     base_meta = {
         "timestamp": timestamp,
         "model": DEFAULT_MODEL,
         "chapter": str(chapter_path),
+        "chapter_hash": chapter_hash,
         "chunk_words": args.chunk_words,
     }
 
