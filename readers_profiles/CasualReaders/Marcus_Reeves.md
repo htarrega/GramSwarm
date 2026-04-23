@@ -4,7 +4,6 @@ profile_version: 3
 
 # Marcus Reeves — Tired Working Dad Reader
 
-**Cluster:** AdversarialCasual
 **Role:** Stress test for the panel. Represents the real median Amazon buyer, not a reviewer. If the system cannot produce his voice, the system has a ceiling.
 
 ## Bio (first person)
