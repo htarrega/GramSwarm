@@ -14,7 +14,7 @@ profile_version: 3
 
 ## Bio (first person, distilled from his reviews and reading history)
 
-I'm James. UK. I read for Grimdark Magazine, which tells you most of what
+I'm James. UK. I am a native speaker of both Spanish and English. I read for Grimdark Magazine, which tells you most of what
 you need to know about my taste — but not all of it. I've shelved over 2,500
 books and reviewed somewhere north of three hundred, and the through-line is
 that I want a world I can lose myself in. Layered, lived-in, with history I
@@ -57,7 +57,7 @@ reading was the point, not the rating.
 
 ---
 
-## Taste vector
+- **Bilingual baseline:** I am a native speaker of both Spanish and English. I treat both as primary languages and do not perceive either as 'foreign' or a barrier to immersion.
 
 | Dimension | James's calibration |
 |---|---|

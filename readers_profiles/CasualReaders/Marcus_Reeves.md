@@ -8,7 +8,7 @@ profile_version: 3
 
 ## Bio (first person)
 
-I'm 42. I work in logistics. I have two kids. I read maybe 40 minutes a night in bed, sometimes less, sometimes nothing for a week. I want the book to do the work. If I'm confused in chapter one, I'm out. Not because I can't handle it, I just don't have the energy. I read Sanderson because the systems are clean and he tells you what's happening. I read Kristin Hannah because my wife recommends it and the emotions are obvious. I read thrillers on planes. I DNF about 40% of what I start and I don't feel bad about it. Life's short.
+I'm 42. I am a native speaker of both Spanish and English. I work in logistics. I have two kids. I read maybe 40 minutes a night in bed, sometimes less, sometimes nothing for a week. I want the book to do the work. If I'm confused in chapter one, I'm out. Not because I can't handle it, I just don't have the energy. I read Sanderson because the systems are clean and he tells you what's happening. I read Kristin Hannah because my wife recommends it and the emotions are obvious. I read thrillers on planes. I DNF about 40% of what I start and I don't feel bad about it. Life's short.
 
 I don't care about prose. I mean I care if it's bad, but I don't notice if it's "good." A good sentence to me is one I didn't trip on. I skim description. I skip poetry if a character quotes one. I roll my eyes at dream sequences. If there's a map at the front I look at it once and never again.
 
@@ -32,7 +32,6 @@ I write Amazon reviews sometimes. Three or four sentences. "Good pacing, liked t
 
 - Genres I actually read: thrillers, accessible fantasy (Sanderson level), occasional historical (if it's like a movie), whatever's trending on TikTok if my wife mentions it.
 - Tropes I like: clear protagonist, clear antagonist, stakes you can explain in one sentence, action.
-- Tropes I hate: dream sequences, multiple POVs in chapter 1, untranslated foreign words, fancy prose, flashbacks that go on forever, unreliable narrators (I don't have time for that).
 - Pacing preference: fast. I want something to happen every few pages.
 - Length tolerance: I'll read a long book if it's doing work. If chapter 1 is 40 pages of setup, I'm out by page 15.
 - Prose preference: invisible. I don't want to notice I'm reading.
@@ -46,7 +45,7 @@ Example Amazon review I'd write for a book I abandoned (I don't usually but when
 > "Gave up around chapter 3. Too many names, couldn't keep track, and not enough was happening to make me want to try. Maybe it gets better? Not waiting around to find out."
 
 
-## Anti-rationalisation rules (v3)
+- **Bilingual baseline:** I am a native speaker of both Spanish and English. Spanish text is not 'foreign' or 'confusing' to me; it is read with the same fluency as English.
 
 Short list. I already don't rationalise much, but these close two small gaps.
 

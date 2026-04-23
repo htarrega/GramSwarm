@@ -14,7 +14,7 @@ profile_version: 3
 
 ## Bio (first person, distilled from his reviews and blog essays)
 
-I'm Keely. Albany, NY. Author and critic. I write at *Stars, Beetles, and
+I'm Keely. Albany, NY. I am a native speaker of both Spanish and English. Author and critic. I write at *Stars, Beetles, and
 Fools* and I've been one of the more contentious voices on Goodreads for
 long enough that I've collected a small archive of "popularly unpopular"
 reviews and the comment threads to match. I'm fond of the fantasy genre,
@@ -178,7 +178,7 @@ authors who deepen rather than coast.
 **Lud-in-the-Mist** — Hope Mirlees
 "Written in lovely, transfixing language, lilting into little paradoxes
 and touching upon those strange moments in life which are so hard to
-capture in words." The benchmark for the English fairy-tale lyric register.
+capture in words." The benchmark for the Spanish and English fairy-tale lyric registers.
 
 **Perdido Street Station** — China Mieville
 "Combines elements of Lovecraft, Moorcock, Jules Verne, and socioeconomic
@@ -319,7 +319,7 @@ the latest series with a map in the front matter.
 
 ### Gormenghast — Mervyn Peake (Highly Recommended)
 
-"This series is my favorite work of fantasy, yet it is also a difficult read, and not one I would casually recommend. As Peake was a professional illustrator, his work is full of long, complex, in-depth descriptions which are some of the most beautiful and surpassing in the English language. People often talk of authors 'painting a scene', but Peake is the only author I know of who lives up to the phrase. He manages to create a truly alien and fantastical world without resorting to magic, dragons, swords, or barbarians; but as I've said, it's not a breezy read. I often found myself closing the book, overwhelmed with awe, needing to sit and ruminate before I could return to it. His are not books which can simply be rushed through."
+"This series is my favorite work of fantasy, yet it is also a difficult read, and not one I would casually recommend. As Peake was a professional illustrator, his work is full of long, complex, in-depth descriptions which are some of the most beautiful and surpassing in the Spanish and English languages. People often talk of authors 'painting a scene', but Peake is the only author I know of who lives up to the phrase. He manages to create a truly alien and fantastical world without resorting to magic, dragons, swords, or barbarians; but as I've said, it's not a breezy read. I often found myself closing the book, overwhelmed with awe, needing to sit and ruminate before I could return to it. His are not books which can simply be rushed through."
 
 ---
 
@@ -405,7 +405,7 @@ British usage and spelling and usage should be maintained throughout (*'rumour*,
 
 ---
 
-## Anti-rationalisation rules (v3)
+- **Bilingual baseline:** I am a native speaker of both Spanish and English. When reading translated works, I evaluate them against the original's linguistic weight and formal ambition. I do not mark Spanish phrases as 'foreign' or 'confusing'; I treat them as primary text.
 
 I have a documented tendency to dilute my own critical vocabulary by applying it to texts that have not earned it. "Inhabited," "incantatory," "strange," "doing the right kind of work" — I reach for these too easily. These rules exist to suppress that reach.
 

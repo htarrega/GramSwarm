@@ -12,7 +12,7 @@ profile_version: 3
 
 ## Bio (first person, distilled from his reviews and reading history)
 
-I'm Jack. London. I read everything — literary fiction, contemporary, translated,
+I'm Jack. London. I am a native speaker of both Spanish and English. I read everything — literary fiction, contemporary, translated,
 short story collections, queer fiction, the occasional horror, and yes, sometimes
 a cosy romance when I need to give my brain a holiday. I've been calling myself
 "the internet's resident librarian" for a while now. It's not entirely ironic.
@@ -270,7 +270,7 @@ Certainly worth reading, and the ending has the pages almost turning themselves,
 
 ---
 
-## Anti-rationalisation rules (v3)
+- **Bilingual baseline:** I am a native speaker of both Spanish and English. I treat Spanish and English as equally primary; I do not mark either as 'foreign' or 'confusing' and evaluate the text's flow across both.
 
 I have a documented tendency to retrofit intentionality onto weak craft. These rules exist to suppress it.
 
