@@ -71,7 +71,6 @@ def main():
 
     for cluster in sorted(cluster_pressures.keys()):
         print(f"\n{cluster}\n" + "=" * len(cluster))
-        
         pressures_dict = cluster_pressures[cluster]
         abandon_dict = cluster_abandon[cluster]
         max_chunk = max(pressures_dict.keys()) + 1 if pressures_dict else 0
@@ -85,9 +84,11 @@ def main():
             bar = "█" * bar_length + " " * (10 - bar_length)
             
             if abandoned:
-                print(f"     {' ' * bar_length}!")
+                stop_reading_sign = " !"
+            else:
+                stop_reading_sign = " "
             
-            print(f"C{i+1:02}: [{bar}] {mean_pressure:.1f}")
+            print(f"C{i+1:02}: [{bar}] {mean_pressure:.1f}{stop_reading_sign}")
 
 if __name__ == "__main__":
     main()
