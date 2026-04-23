@@ -47,7 +47,28 @@ class ChunkTrace(BaseModel):
     )
     @classmethod
     def _parse_if_str(cls, v):
-        return json.loads(v) if isinstance(v, str) else v
+        if not isinstance(v, str):
+            return v
+        v = v.strip()
+        try:
+            return json.loads(v)
+        except json.JSONDecodeError as e:
+            if "Extra data" in str(e):
+                # Extract the first balanced JSON object
+                start = v.find('{')
+                if start != -1:
+                    bracket_count = 0
+                    for i in range(start, len(v)):
+                        if v[i] == '{':
+                            bracket_count += 1
+                        elif v[i] == '}':
+                            bracket_count -= 1
+                            if bracket_count == 0:
+                                try:
+                                    return json.loads(v[start : i + 1])
+                                except json.JSONDecodeError:
+                                    pass
+            raise e
 
 
 class ChapterEnd(BaseModel):
