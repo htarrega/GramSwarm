@@ -82,6 +82,9 @@ class ChapterEnd(BaseModel):
 class ChunkUsage(BaseModel):
     input_tokens: int
     output_tokens: int
+    cache_creation_input_tokens: int = 0
+    cache_read_input_tokens: int = 0
+    cost_usd: float = 0.0
 
 
 class ChunkRecord(BaseModel):
@@ -105,6 +108,9 @@ class RunMeta(BaseModel):
     input_tokens: int
     output_tokens: int
     total_tokens: int
+    cache_creation_input_tokens: int = 0
+    cache_read_input_tokens: int = 0
+    cost_usd: float = 0.0
 
 
 class TraceRecord(BaseModel):

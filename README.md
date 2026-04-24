@@ -26,22 +26,32 @@ The output is raw traces per reader, saved as JSON and rendered markdown. No hea
 ## Usage
 
 ```bash
-python run.py chapters/mi_capitulo.txt
+python run.py chapters/<chapter>.txt
 ```
 
 Loads all profiles from `readers_profiles/` automatically and runs them sequentially. Output goes to `runs/{timestamp}_{chapter}/`.
 
 ```bash
-python run.py chapters/mi_capitulo.txt --chunk-words 300
+python run.py chapters/<chapter>.txt --chunk-words 300
 ```
+
+Place your chapter file under `chapters/` as plain text (UTF-8). Any filename works; the stem is used to name the run directory.
 
 ### Re-render markdown from a saved run
 
 If a run crashes mid-save, recover with:
 
 ```bash
-python extract.py runs/20260419_123315_El\ hierro\ llama\ al\ hierro
+python extract.py runs/<timestamp>_<chapter>
 ```
+
+### Quick look at continue-pressure across a run
+
+```bash
+python analyze_pressure.py runs/<timestamp>_<chapter>
+```
+
+Prints a per-cluster bar chart of mean `continue_pressure` per chunk, with `!` marking any chunk where at least one reader abandoned. Reads the rendered `trace.md` files — useful for eyeballing pacing dips and abandonment clustering before opening individual traces.
 
 ---
 
@@ -49,15 +59,15 @@ python extract.py runs/20260419_123315_El\ hierro\ llama\ al\ hierro
 
 ```
 readers_profiles/
-  ProfessionalReaders/     # cluster = folder name
-    jack_edwards.md
-  CasualCrossover/
-    placeholder.md
+  <ClusterName>/           # cluster = folder name
+    <reader>.md
+  <AnotherCluster>/
+    <reader>.md
 chapters/                  # manuscript chapters
 runs/                      # output (gitignored)
-  {timestamp}_{chapter}/
-    {ClusterName}/
-      {reader}/
+  <timestamp>_<chapter>/
+    <ClusterName>/
+      <reader>/
         trace.json
         trace.md
     run_meta.json
@@ -125,9 +135,41 @@ The trace schema and agent design are grounded in the following papers:
 
 ---
 
+## Cost & caching
+
+Each reader runs as an accumulating conversation: chunk N's call re-sends the system prompt (reader profile + reading instructions) plus every prior chunk's user message and the model's trace for it. Without caching, the reader profile (~4–7k tokens for a detailed one) and the growing prefix are paid for at full input rate on every call.
+
+GramSwarm uses Anthropic **prompt caching** with two ephemeral breakpoints per API call:
+
+1. **The system prompt** — the reader's profile and the reading instructions. Re-used across every chunk for that reader.
+2. **The last assistant turn** — caches the whole conversation prefix (system + every completed chunk + its trace) up through the most recent model response.
+
+TTL is 5 minutes. Since chunks within a reader run sequentially, the cache stays warm across a reader's calls. Caches are per-reader — each profile is a different system prompt, so readers don't share cache.
+
+**Observed effect on a typical reader run** (system + 4 chunks + end-of-chapter = 6 calls):
+- Call 1: writes system to cache.
+- Call 2: reads system; writes an extended prefix up through the first trace.
+- Calls 3–6: read the growing prefix at ~10% of base input price; each writes a slightly longer prefix.
+
+Run output now reports the real API-billed cost, broken down by category:
+
+```
+Tokens   : in=2100 cache_write=8840 cache_read=35200 out=6300  (cache hit 76.1% of input)
+Cost     : $0.1234
+```
+
+- `in` = fresh input tokens (new user message in the call)
+- `cache_write` = tokens written to cache this call (billed at 1.25× base)
+- `cache_read` = tokens read from cache (billed at 0.1× base)
+- `out` = output tokens
+
+Pricing is hard-coded in `engine.PRICING_PER_MTOK` (currently `claude-sonnet-4-6`). Update it if you swap models.
+
+---
+
 ## Requirements
 
 ```bash
-pip install anthropic
+pip install -r requirements.txt
 export ANTHROPIC_API_KEY=sk-ant-...
 ```

@@ -58,7 +58,8 @@ def main() -> None:
         "chunk_words": args.chunk_words,
     }
 
-    total_in = total_out = 0
+    total_in = total_out = total_cw = total_cr = 0
+    total_cost = 0.0
     for result in results:
         if "error" in result:
             continue
@@ -66,17 +67,27 @@ def main() -> None:
             save_reader_run(run_dir, result, chapter_path.name, base_meta)
         except Exception as exc:
             print(f"  [{result['profile'].name}] save failed: {exc}", file=sys.stderr)
-        total_in += result["usage"]["input_tokens"]
-        total_out += result["usage"]["output_tokens"]
+        u = result["usage"]
+        total_in += u["input_tokens"]
+        total_out += u["output_tokens"]
+        total_cw += u.get("cache_creation_input_tokens", 0)
+        total_cr += u.get("cache_read_input_tokens", 0)
+        total_cost += u.get("cost_usd", 0.0)
 
     save_run_meta(run_dir, base_meta, results)
 
     successful = sum(1 for r in results if "error" not in r)
     failed = len(results) - successful
-    cost = (total_in * 3 + total_out * 15) / 1_000_000
+    cached_in = total_cw + total_cr
+    billed_in = total_in + cached_in
+    hit_rate = (total_cr / billed_in * 100) if billed_in else 0.0
 
     print(f"\nDone     : {successful} ok" + (f", {failed} failed" if failed else ""))
-    print(f"Tokens   : {total_in + total_out}  |  Cost~: ${cost:.4f}")
+    print(
+        f"Tokens   : in={total_in} cache_write={total_cw} cache_read={total_cr} "
+        f"out={total_out}  (cache hit {hit_rate:.1f}% of input)"
+    )
+    print(f"Cost     : ${total_cost:.4f}")
 
 
 if __name__ == "__main__":

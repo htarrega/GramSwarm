@@ -30,6 +30,8 @@ def test_read_chapter_mock(mocker):
     mock_response = MagicMock()
     mock_response.usage.input_tokens = 10
     mock_response.usage.output_tokens = 20
+    mock_response.usage.cache_creation_input_tokens = 0
+    mock_response.usage.cache_read_input_tokens = 0
     
     # Mock content blocks for tool_use
     block = MagicMock()

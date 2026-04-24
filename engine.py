@@ -17,6 +17,27 @@ from tools import CHAPTER_END_TOOL, CHUNK_TRACE_TOOL
 DEFAULT_CHUNK_WORDS = 500
 DEFAULT_MODEL = "claude-sonnet-4-6"
 
+PRICING_PER_MTOK: dict[str, dict[str, float]] = {
+    "claude-sonnet-4-6": {
+        "input": 3.00,
+        "cache_write": 3.75,
+        "cache_read": 0.30,
+        "output": 15.00,
+    },
+}
+
+
+def compute_cost_usd(usage: dict, model: str) -> float:
+    p = PRICING_PER_MTOK.get(model)
+    if not p:
+        return 0.0
+    return (
+        usage.get("input_tokens", 0) * p["input"]
+        + usage.get("cache_creation_input_tokens", 0) * p["cache_write"]
+        + usage.get("cache_read_input_tokens", 0) * p["cache_read"]
+        + usage.get("output_tokens", 0) * p["output"]
+    ) / 1_000_000
+
 _FRONTMATTER_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 
 
@@ -110,6 +131,26 @@ def _save_call_log(
     (calls_dir / f"{log_ctx['call_name']}.json").write_text(json.dumps(record, indent=2))
 
 
+def _apply_cache_control(messages: list[dict]) -> None:
+    """Keep exactly one ephemeral cache breakpoint on the last assistant message.
+
+    Combined with a cache breakpoint on the system prompt, this caches the full
+    prefix (system + all completed chunk turns) on every call after the first.
+    """
+    last_asst = -1
+    for i, msg in enumerate(messages):
+        if msg["role"] != "assistant":
+            continue
+        content = msg["content"]
+        if isinstance(content, str):
+            msg["content"] = [{"type": "text", "text": content}]
+        for block in msg["content"]:
+            block.pop("cache_control", None)
+        last_asst = i
+    if last_asst >= 0:
+        messages[last_asst]["content"][-1]["cache_control"] = {"type": "ephemeral"}
+
+
 def _call_tool(
     client: anthropic.Anthropic,
     system: str,
@@ -120,12 +161,16 @@ def _call_tool(
     log_ctx: dict | None = None,
 ) -> tuple[dict, dict, float]:
     """Returns (tool_output, usage, elapsed_seconds)."""
+    _apply_cache_control(messages)
+    system_blocks = [
+        {"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}
+    ]
     t0 = time.time()
     for attempt in range(max_retries):
         response = client.messages.create(
             model=model,
             max_tokens=2048,
-            system=system,
+            system=system_blocks,
             messages=messages,
             tools=[tool],
             tool_choice={"type": "tool", "name": tool["name"]},
@@ -133,10 +178,14 @@ def _call_tool(
         elapsed = time.time() - t0
         for block in response.content:
             if block.type == "tool_use":
+                u = response.usage
                 usage = {
-                    "input_tokens": response.usage.input_tokens,
-                    "output_tokens": response.usage.output_tokens,
+                    "input_tokens": u.input_tokens,
+                    "output_tokens": u.output_tokens,
+                    "cache_creation_input_tokens": getattr(u, "cache_creation_input_tokens", 0) or 0,
+                    "cache_read_input_tokens": getattr(u, "cache_read_input_tokens", 0) or 0,
                 }
+                usage["cost_usd"] = round(compute_cost_usd(usage, model), 6)
                 if log_ctx is not None:
                     _save_call_log(
                         log_ctx=log_ctx,
@@ -159,11 +208,13 @@ def read_chapter(
     model: str,
     calls_dir: Path | None = None,
     chapter_hash: str = "",
-) -> tuple[list[dict], dict, dict]:
+    messages: list[dict] | None = None,
+) -> tuple[list[dict], dict, dict, list[dict]]:
     system = build_system(profile)
-    messages: list[dict] = []
+    if messages is None:
+        messages = []
     chunks_data: list[dict] = []
-    total_in = total_out = 0
+    total_in = total_out = total_cw = total_cr = 0
 
     for i, chunk in enumerate(chunks):
         print(f"  chunk {i + 1}/{len(chunks)} ...", end=" ", flush=True)
@@ -192,7 +243,14 @@ def read_chapter(
         )
         total_in += usage["input_tokens"]
         total_out += usage["output_tokens"]
-        print(f"done ({elapsed:.1f}s | {usage['input_tokens']}+{usage['output_tokens']} tok)")
+        total_cw += usage["cache_creation_input_tokens"]
+        total_cr += usage["cache_read_input_tokens"]
+        print(
+            f"done ({elapsed:.1f}s | in={usage['input_tokens']} "
+            f"cw={usage['cache_creation_input_tokens']} "
+            f"cr={usage['cache_read_input_tokens']} "
+            f"out={usage['output_tokens']})"
+        )
 
         try:
             ChunkTrace.model_validate(trace)
@@ -229,18 +287,29 @@ def read_chapter(
     )
     total_in += usage["input_tokens"]
     total_out += usage["output_tokens"]
-    print(f"done ({elapsed:.1f}s | {usage['input_tokens']}+{usage['output_tokens']} tok)")
+    total_cw += usage["cache_creation_input_tokens"]
+    total_cr += usage["cache_read_input_tokens"]
+    print(
+        f"done ({elapsed:.1f}s | in={usage['input_tokens']} "
+        f"cw={usage['cache_creation_input_tokens']} "
+        f"cr={usage['cache_read_input_tokens']} "
+        f"out={usage['output_tokens']})"
+    )
 
     try:
         ChapterEnd.model_validate(chapter_end)
     except Exception as exc:
         print(f"  [warn] chapter_end schema invalid: {exc}", file=sys.stderr)
 
-    return chunks_data, chapter_end, {
+    reader_usage = {
         "input_tokens": total_in,
         "output_tokens": total_out,
-        "total_tokens": total_in + total_out,
+        "cache_creation_input_tokens": total_cw,
+        "cache_read_input_tokens": total_cr,
+        "total_tokens": total_in + total_out + total_cw + total_cr,
     }
+    reader_usage["cost_usd"] = round(compute_cost_usd(reader_usage, model), 6)
+    return chunks_data, chapter_end, reader_usage, messages
 
 
 def run_readers(

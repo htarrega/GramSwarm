@@ -23,7 +23,11 @@ def render_reader_markdown(
         f"**Profile v:** {meta.get('profile_version', '?')}  |  "
         f"**Chapter:** `{meta.get('chapter_hash', '')}`  ",
         f"**Chunks:** {meta['num_chunks']} × ~{meta['chunk_words']} words  ",
-        f"**Tokens:** {meta['total_tokens']} (in: {meta['input_tokens']}, out: {meta['output_tokens']})",
+        f"**Tokens:** in={meta['input_tokens']} "
+        f"cache_write={meta.get('cache_creation_input_tokens', 0)} "
+        f"cache_read={meta.get('cache_read_input_tokens', 0)} "
+        f"out={meta['output_tokens']}  ",
+        f"**Cost:** ${meta.get('cost_usd', 0.0):.4f}",
         f"",
         f"---",
         f"",
@@ -120,6 +124,9 @@ def save_reader_run(
         "input_tokens": usage["input_tokens"],
         "output_tokens": usage["output_tokens"],
         "total_tokens": usage["total_tokens"],
+        "cache_creation_input_tokens": usage.get("cache_creation_input_tokens", 0),
+        "cache_read_input_tokens": usage.get("cache_read_input_tokens", 0),
+        "cost_usd": usage.get("cost_usd", 0.0),
     }
 
     (reader_dir / "trace.json").write_text(
