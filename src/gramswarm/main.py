@@ -69,7 +69,9 @@ def analyze(
     analyzer = RunAnalyzer(str(run_dir))
     data = analyzer.analyze_pressure()
     abandons = analyzer.analyze_abandons()
+    cohesion = analyzer.analyze_cohesion()
     analyzer.render_ascii_chart(data, abandons)
+    analyzer.render_cohesion_gauge(cohesion)
 
 if __name__ == "__main__":
     app()

@@ -18,7 +18,7 @@ You dont need to export your anthropic key if you already have it in your .bashr
 ### Running a Simulation
 Place your chapter file under `chapters/` as plain text (UTF-8).
 ```bash
-# Run simulation on a chapter
+# Run simulation on a chapter or story
 python -m gramswarm.main run chapters/<chapter>.txt
 
 # Run with a custom chunk size
@@ -27,13 +27,21 @@ python -m gramswarm.main run chapters/<chapter>.txt --chunk-size 300
 Loads all profiles from `readers_profiles/` automatically and runs them sequentially. Output goes to `runs/{timestamp}_{chapter}/`.
 
 ### Analyzing Results
-Quickly eyeball pacing dips and abandonment clustering:
+GramSwarm separates **High-Level Analysis** (for quick diagnosis) from **Raw Trace Data** (for deep-dive editing).
+
+#### 1. Analytical Reports (CLI)
+Quickly eyeball pacing dips, abandonment clustering, and overall reader alignment:
 ```bash
 python -m gramswarm.main analyze runs/<timestamp>_<chapter>
 ```
-Prints a per-cluster bar chart of mean `continue_pressure` per chunk, marking any chunk where at least one reader in that cluster abandoned the reading. In case of abandon in a specific chunk, the chunk is marked with "!". 
+This generates:
+- **Continuity Pressure Analysis**: Visual bar charts of mean `continue_pressure` per chunk, marking abandonment risks with `!!`.
+- **Global Panel Cohesion Index (PCI)**: A visual gauge showing if the reader panel is in sync or polarized.
 
-![alt text](images/image.png)
+![GramSwarm Analysis Report](images/image.png)
+*Example of the Continuity Pressure and Panel Cohesion analysis.*
+#### 2. Raw Trace Data (JSON)
+Every reader's internal monologue and precise metrics are saved as JSON files in the run directory. These are intended for the author to open and read to understand *why* a reader felt bored or confused.
 
 
 ## Architecture & Structure
@@ -44,7 +52,7 @@ GramSwarm is built as a professional Python package using a layered domain archi
 src/gramswarm/
   core/           # Domain logic, Pydantic schemas, and Simulation Engine
   providers/      # AI Adapters (Anthropic, etc.) with prompt caching
-  services/       # IO handlers, Markdown engine, and Analysis tools
+  services/       # IO handlers, Analysis tools
   main.py         # CLI entry point
 readers_profiles/ # Cluster-based reader personas (.md files)
 chapters/         # Manuscript input
@@ -53,21 +61,32 @@ runs/             # Output artifacts (Git-ignored)
 
 ## Metrics Reference
 
-### Per-chunk trace
+### Visualized Metrics (High-Level Signals)
+These metrics are aggregated and rendered in the CLI `analyze` report.
+
 | Metric | Type | What it measures |
 |---|---|---|
-| `prediction_next_beat` | free text | What the reader expects to happen next. The primary signal. |
+| `continue_pressure` | 1–5 | Honest urge to keep reading. Used for the Pressure Chart. |
+| `would_abandon` | bool | Hard quit signal. Used to identify "leaks" in the narrative. |
+| `Panel Cohesion (PCI)`| 0.0-1.0 | Global sync. Tells you if the experience is universal or polarizing. |
+
+### Deep-Dive Metrics (Raw JSON)
+These metrics are stored in the JSON traces for manual author review. In the future they will be added.
+
+#### Per-chunk trace
+| Metric | Type | What it measures |
+|---|---|---|
+| `raw_content` | text | The reader's internal monologue (the "Why"). |
+| `prediction_next_beat` | text | What the reader expects to happen next. The primary signal. |
 | `prediction_confidence` | 1–5 | How certain the reader is. |
 | `open_questions` | list | Questions the reader is actively holding. |
 | `active_expectations` | list | Promises the reader believes the author has made. |
-| `confusion_points` | list of {quote, why} | Specific sentences where the reader lost the thread. |
+| `confusion_points` | list | Specific sentences where the reader lost the thread. |
 | `salience_claim` | 1–5 | How important this chunk feels for the story. |
-| `emotional_register` | tone + intensity | What emotional note the scene is playing. |
-| `continue_pressure` | 1–5 | Honest urge to keep reading. |
-| `would_abandon` | bool + reason | Hard quit signal. |
-| `voice_match_check` | score + note | How well this chunk fits the reader's taste. |
+| `emotional_register` | tone+int | What emotional note the scene is playing. |
+| `voice_match_check` | score+note | How well this chunk fits the reader's taste. |
 
-### End-of-chapter trace
+#### End-of-chapter trace
 | Metric | What it measures |
 |---|---|
 | `summary_as_retained` | What the reader would tell a friend happened. |

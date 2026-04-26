@@ -91,6 +91,86 @@ class RunAnalyzer:
 
         return cluster_data
 
+    def analyze_cohesion(self) -> float:
+        """
+        Calculates the Global Panel Cohesion Index (PCI).
+        Average Pearson correlation between all reader pressure curves.
+        """
+        all_curves: List[List[float]] = []
+        for cluster_dir in self.run_dir.iterdir():
+            if not cluster_dir.is_dir():
+                continue
+            for reader_dir in cluster_dir.iterdir():
+                if not reader_dir.is_dir():
+                    continue
+                chunks = sorted(reader_dir.glob("chunk_*.json"))
+                pressures = []
+                for chunk_file in chunks:
+                    try:
+                        data = json.loads(chunk_file.read_text(encoding="utf-8"))
+                        pressures.append(float(data.get("continue_pressure", 3)))
+                    except Exception:
+                        continue
+                if pressures:
+                    all_curves.append(pressures)
+
+        if len(all_curves) < 2:
+            return 1.0
+
+        def get_correlation(x: List[float], y: List[float]) -> float:
+            if len(x) != len(y) or len(x) < 2:
+                return 0.0
+            mu_x = sum(x) / len(x)
+            mu_y = sum(y) / len(y)
+            num = sum((xi - mu_x) * (yi - mu_y) for xi, yi in zip(x, y))
+            den_x = sum((xi - mu_x)**2 for xi in x)**0.5
+            den_y = sum((yi - mu_y)**2 for yi in y)**0.5
+            if den_x == 0 or den_y == 0:
+                return 0.0
+            return num / (den_x * den_y)
+
+        correlations = []
+        for i in range(len(all_curves)):
+            for j in range(i + 1, len(all_curves)):
+                correlations.append(get_correlation(all_curves[i], all_curves[j]))
+
+        return sum(correlations) / len(correlations) if correlations else 1.0
+
+    def render_cohesion_gauge(self, pci: float):
+        """
+        Renders a visual gauge for the Panel Cohesion Index with a polished CLI look.
+        """
+        width = 40
+        pos = int(pci * width)
+        bar = ["░"] * width
+        if 0 <= pos < width:
+            bar[pos] = "█"
+        
+        bar_str = "".join(bar)
+        label_prefix = "  [Fragmented] "
+        offset = len(label_prefix)
+        
+        if pci < 0.2:
+            meaning = "Total Fragmentation"
+        elif pci < 0.4:
+            meaning = "Low Cohesion"
+        elif pci < 0.6:
+            meaning = "Moderate Cohesion"
+        elif pci < 0.8:
+            meaning = "High Cohesion"
+        else:
+            meaning = "Total Sync"
+            
+        print("\n--- GLOBAL PANEL COHESION ---")
+        print(f"PCI: {pci:.3f}")
+        print(f"{label_prefix}{bar_str} [Total Sync]")
+        
+        pointer_line = " " * (offset + pos) + "▲"
+        meaning_line = " " * (offset + pos - len(meaning)//2) + f"({meaning})"
+        
+        print(pointer_line)
+        print(meaning_line)
+
     def render_ascii_chart(self, cluster_data: Dict[str, List[float]], abandon_data: Dict[str, List[bool]] = None):
         """
         Renders a dense ASCII bar chart of the pressure.
