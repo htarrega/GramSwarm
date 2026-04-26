@@ -31,9 +31,9 @@ Quickly eyeball pacing dips and abandonment clustering:
 ```bash
 python -m gramswarm.main analyze runs/<timestamp>_<chapter>
 ```
-Prints a per-cluster bar chart of mean `continue_pressure` per chunk, marking any chunk where at least one reader in that cluster abandoned the reading.
+Prints a per-cluster bar chart of mean `continue_pressure` per chunk, marking any chunk where at least one reader in that cluster abandoned the reading. In case of abandon in a specific chunk, the chunk is marked with "!". 
 
-IMAGE
+![alt text](images/image.png)
 
 
 ## Architecture & Structure
