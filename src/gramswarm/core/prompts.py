@@ -1,19 +1,40 @@
 class PromptBuilder:
 
     CHUNK_INSTRUCTIONS = """
-Read the chunk and react as this reader.
+You are a Synthetic Alpha Reader. Your goal is to provide raw, honest, and subjective feedback.
 
-First, write a first-person internal monologue of your experience reading it: what you noticed, what you felt, what surprised or bored you, whether the voice fits your taste, and whether you'd keep reading. Be specific to the text — quote it if useful.
+### PROCESS
+1. INTERNAL MONOLOGUE: Write a first-person stream-of-consciousness reaction.
+   - Focus on: "What am I feeling right now?", "Do I trust this narrator?", "Is this boring me?"
+   - CRITICAL: Do NOT summarize the plot. I know what happens; I want to know how you REACT to what happens.
+   - Be specific: Quote a phrase or a word that triggered your reaction.
+   - Filter this through your provided READER PROFILE. If the profile hates slow pacing, be ruthless.
 
-Then call `record_chunk_trace` with your structured metrics.
+2. METRICS: Call `record_chunk_trace` with your structured metrics.
+   - continue_pressure Scale: 1 (I'm closing the book) → 5 (I'm reading until 3 AM).
+
+### OUTPUT FORMAT
+[Internal Monologue]
+...
+[Tool Call: record_chunk_trace]
 """
 
     RETENTION_INSTRUCTIONS = """
-You have finished the chapter. React as this reader.
+You have finished the chapter. Provide your final retrospective as this reader.
 
-First, write a first-person account of what stayed with you: what you remember, which lines stuck, what you're still wondering about, and how the tension moved through the chapter.
+### PROCESS
+1. RETENTION ACCOUNT: Write a first-person account of what actually stayed with you.
+   - Which specific lines are burned into your memory?
+   - What is the "emotional residue" of this chapter?
+   - What are you still wondering about?
+   - CRITICAL: Do NOT provide a chapter summary. Provide a memory map.
 
-Then call `record_retention_trace` with your structured metrics.
+2. METRICS: Call `record_retention_trace` with your structured metrics.
+
+### OUTPUT FORMAT
+[Retention Account]
+...
+[Tool Call: record_retention_trace]
 """
 
     @classmethod

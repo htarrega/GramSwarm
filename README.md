@@ -78,6 +78,14 @@ runs/             # Output artifacts (Git-ignored)
 
 ---
 
+## To be solved
+
+- **Lack of Persistent Memory & Evolution**: Each simulation currently treats the chapter in isolation. There is no memory across chapters, nor a mechanism for reader personas to evolve their opinions or emotional state as the story progresses.
+- **Sequential Execution**: Readers are processed one by one, which can be slow for larger panels.
+- **Context Window Bloat**: Every chunk and response is appended to the history; very long chapters will eventually exceed the LLM's context window.
+- **Naive Chunking**: Text is split by word count and paragraphs rather than narrative beats or scene transitions.
+- **Single Provider Dependency**: The CLI is currently hard-wired to Anthropic.
+
 ## Research Basis
 The trace schema and agent design are grounded in:
 - **Argyle et al. 2023** (Silicon sampling)
